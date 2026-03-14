@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LMS_API.Data;
+using LMS_API.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LMS_API.Controllers
 {
@@ -6,15 +9,32 @@ namespace LMS_API.Controllers
     [ApiController]
     public class TeacherController:ControllerBase
     {
-        [HttpGet]
-        public string GetTeacherLogin()
+        private readonly ApplicationDbContext _db;
+        public TeacherController(ApplicationDbContext db)
         {
-            return "Get request (for teacher login)-Sprint1-API-Get Request";
+            _db = db;            
         }
-        [HttpGet("{id:int}")]
-        public string GetTeacherById(int id)
+        
+
+        [HttpPost]
+        public async Task<ActionResult<Teacher>> CreateTeacher(Teacher teacher)
         {
-            return $"Fetching Teacher Id: {id}";
+            try
+            {
+                if (teacher == null)
+                {
+                    return BadRequest("Teacher data is required");
+                }
+                await _db.Teacher.AddAsync(teacher); // Teacher is a table name in SQL, and teacher is an object which has properties that will be stored in Teacher table .
+                await _db.SaveChangesAsync();
+                return Ok(teacher);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"An error occurred while creating the teacher: {ex.Message} ");
+            }
         }
+        
     }
 }
