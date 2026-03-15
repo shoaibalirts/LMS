@@ -42,11 +42,17 @@ namespace LMS_API.Controllers
 
                 };
                 */
+
+                var duplicateEmail = await _db.Teacher.FirstOrDefaultAsync(u=>u.Email.ToLower()==teacherDTO.Email.ToLower());
+                if (duplicateEmail != null)
+                {
+                    return Conflict($"'{teacherDTO.Email}' already exists.");
+                }
                 Teacher teacher = _mapper.Map<Teacher>(teacherDTO);
                 await _db.Teacher.AddAsync(teacher); // Teacher is a table name in SQL, and teacherDTO is an object which has properties that will be stored in Teacher table .
                 await _db.SaveChangesAsync();
                 //return Ok(teacherDTO);
-                return CreatedAtAction(nameof(CreateTeacher),new {id=teacher.Id},teacher);
+                return CreatedAtAction(nameof(CreateTeacher),new {id=teacher.Id},teacher);// instead of Ok
             }
             catch (Exception ex)
             {
