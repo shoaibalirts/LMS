@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 18
-VisualStudioVersion = 18.4.11605.240 stable
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36930.0 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS_API", "LMS_API\LMS_API.csproj", "{BB97D24F-F4C3-49B0-A018-00F25BF834FF}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "lms_frontend", "LMS_Frontend\lms_frontend.esproj", "{1E030CE0-C2F5-8547-15CB-CA1493A329EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS_API_UnitTest", "LMS_API_UnitTest\LMS_API_UnitTest.csproj", "{D75369C6-8183-430E-BE39-8DECF546A255}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{1E030CE0-C2F5-8547-15CB-CA1493A329EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E030CE0-C2F5-8547-15CB-CA1493A329EF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1E030CE0-C2F5-8547-15CB-CA1493A329EF}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{D75369C6-8183-430E-BE39-8DECF546A255}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D75369C6-8183-430E-BE39-8DECF546A255}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D75369C6-8183-430E-BE39-8DECF546A255}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D75369C6-8183-430E-BE39-8DECF546A255}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
