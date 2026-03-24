@@ -49,7 +49,7 @@ namespace LMS_API.Controllers
                     return Conflict($"'{teacherDTO.Email}' already exists.");
                 }
                 Teacher teacher = _mapper.Map<Teacher>(teacherDTO);
-                await _db.Teacher.AddAsync(teacher); // Teacher is a table name in SQL, and teacherDTO is an object which has properties that will be stored in Teacher table .
+                await _db.Teacher.AddAsync(teacher); // Teacher is a table name in SQL, and teacherDTO is an object which has some specific properties allowed to the frontend to stored in Teacher table .
                 await _db.SaveChangesAsync();
                 //return Ok(teacherDTO);
                 return CreatedAtAction(nameof(CreateTeacher), new { id = teacher.Id }, teacher);// instead of Ok
