@@ -1,6 +1,8 @@
 using LMS_API.Data;
 using LMS_API.Models;
 using LMS_API.Models.DTO;
+using LMS_API.Services;
+using LMS_API.Services.Contract;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -17,7 +19,7 @@ builder.Services.AddAutoMapper(o =>
 });
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddScoped<ITeacherService, TeacherService>();
 var app = builder.Build();
 await SeedDataAsync(app);
 

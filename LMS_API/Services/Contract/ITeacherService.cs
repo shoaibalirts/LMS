@@ -1,6 +1,11 @@
-﻿namespace LMS_API.Repository.Contract
+﻿using LMS_API.Models;
+using LMS_API.Models.DTO;
+
+namespace LMS_API.Services.Contract
 {
-    public class ITeacherService
+    public interface ITeacherService
     {
+        Task<Teacher> RegisterTeacherAsync(TeacherCreateDTO teacherDTO);
+        Task<bool> LoginAsync(TeacherLoginDTO loginDTO);
     }
 }
