@@ -1,13 +1,9 @@
 <script setup>
-  import Register from './components/Register.vue'
+  
 </script>
-
 <template>
-  <main>
-    <Register/>
-  </main>
+  <router-view />
 </template>
-
 <style scoped>
 
 </style>
