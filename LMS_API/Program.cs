@@ -1,6 +1,7 @@
 using LMS_API.Data;
 using LMS_API.Models;
 using LMS_API.Models.DTO.Assignment;
+using LMS_API.Models.DTO.Assignmentset;
 using LMS_API.Models.DTO.Teacher;
 using LMS_API.Services;
 using LMS_API.Services.Contract;
@@ -19,6 +20,7 @@ builder.Services.AddAutoMapper(o =>
 {
     o.CreateMap<Teacher, TeacherCreateDTO>().ReverseMap();
     o.CreateMap<Assignment, AssignmentCreateDTO>().ReverseMap();
+    o.CreateMap<AssignmentSet, AssignmentSetCreateDTO>().ReverseMap();
 });
 
 
@@ -27,6 +29,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<ITeacherService, TeacherService>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
+builder.Services.AddScoped<IAssignmentSetService, AssignmentSetService>();
 
 var app = builder.Build();
 await SeedDataAsync(app);

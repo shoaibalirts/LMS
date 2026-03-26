@@ -4,6 +4,7 @@ using LMS_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMS_API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260326145313_AddAssignmentSetsToDb")]
+    partial class AddAssignmentSetsToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,9 +86,6 @@ namespace LMS_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -93,9 +93,6 @@ namespace LMS_API.Migrations
 
                     b.Property<int>("TeacherId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -153,11 +150,9 @@ namespace LMS_API.Migrations
 
             modelBuilder.Entity("LMS_API.Models.Assignment", b =>
                 {
-                    b.HasOne("LMS_API.Models.AssignmentSet", "AssignmentSet")
+                    b.HasOne("LMS_API.Models.AssignmentSet", null)
                         .WithMany("Assignments")
                         .HasForeignKey("AssignmentSetId");
-
-                    b.Navigation("AssignmentSet");
                 });
 
             modelBuilder.Entity("LMS_API.Models.AssignmentSet", b =>

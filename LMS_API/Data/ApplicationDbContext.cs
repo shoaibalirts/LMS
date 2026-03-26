@@ -7,6 +7,7 @@ namespace LMS_API.Data
     {
         public DbSet<Teacher> Teacher { get; set; }
         public DbSet <Assignment> Assignments { get; set; }
+        public DbSet<AssignmentSet> AssignmentSets { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -33,6 +34,12 @@ namespace LMS_API.Data
                     CreatedDate = new DateTime(2026, 3, 25)
                 }
             );
+
+            modelBuilder.Entity<AssignmentSet>()
+                        .HasOne(a => a.Teacher)
+                        .WithMany(t => t.AssignmentSets)
+                        .HasForeignKey(a => a.TeacherId);
+                        
         }
     }
 }

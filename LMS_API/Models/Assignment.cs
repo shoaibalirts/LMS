@@ -27,6 +27,8 @@ namespace LMS_API.Models
         
         public DateTime? CreatedDate { get; set; } // optional. it can be nullable
         public DateTime? UpdatedDate { get; set; } // optional. it can be nullable
-        
+
+        public int? AssignmentSetId { get; set; } // Foreign Key
+        public AssignmentSet AssignmentSet { get; set; } // Navigation back to parent
     }
 }
