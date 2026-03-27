@@ -10,39 +10,18 @@ public static class DbSeeder
         // Ensure database exists and apply migrations
         await context.Database.EnsureCreatedAsync();
 
-        // Check if users already exist
-        try
-        {
-            if (await context.Users.AnyAsync())
-            {
-                return;
-            }
-        }
-        catch
-        {
-            // Table doesn't exist yet - will be created below
-            return;
-        }
-
+    
         // Seed Teacher user
-        var teacher = new User
+        var teacher = new Teacher
         {
             Email = "teacher@school.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Teacher123!"),
-            Role = "Teacher",
-            CreatedAt = DateTime.UtcNow
+            Password = "password123",
+            FirstName = "John",
+            LastName = "Doe",
+            CreatedDate = DateTime.UtcNow,
         };
 
-        // Seed Student user
-        var student = new User
-        {
-            Email = "student@school.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Student123!"),
-            Role = "Student",
-            CreatedAt = DateTime.UtcNow
-        };
-
-        context.Users.AddRange(teacher, student);
+        context.Teacher.AddRange(teacher);
         await context.SaveChangesAsync();
     }
 }

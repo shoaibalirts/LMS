@@ -19,17 +19,7 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddAutoMapper(o =>
-{
-    o.CreateMap<Teacher, TeacherCreateDTO>().ReverseMap();
-    o.CreateMap<Assignment, AssignmentCreateDTO>().ReverseMap();
-    o.CreateMap<Assignment, AssignmentReadDTO>().ReverseMap();
-    o.CreateMap<AssignmentSet, AssignmentSetCreateDTO>().ReverseMap();
-    o.CreateMap<AssignmentSet, AssignmentSetReadDTO>()
-    .ForMember(dest => dest.Assignments,
-               opt => opt.MapFrom(src => src.AssignmentAssignmentSets.Select(x => x.Assignment)));
-});
-
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -37,6 +27,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ITeacherService, TeacherService>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IAssignmentSetService, AssignmentSetService>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.SetIsOriginAllowed(_ => true)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
