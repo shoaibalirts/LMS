@@ -1,3 +1,4 @@
+using System.Text;
 using LMS_API.Data;
 using LMS_API.Models;
 using LMS_API.Models.DTO.Assignment;
@@ -5,7 +6,9 @@ using LMS_API.Models.DTO.Assignmentset;
 using LMS_API.Models.DTO.Teacher;
 using LMS_API.Services;
 using LMS_API.Services.Contract;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,7 +39,14 @@ builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IAssignmentSetService, AssignmentSetService>();
 
 var app = builder.Build();
-await SeedDataAsync(app);
+
+// Seed database in development
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await DbSeeder.SeedAsync(context);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -47,17 +57,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowFrontend");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
-
-// to check if there are any pending migrations then those could be applied. So need of Package manager tool required
-static async Task SeedDataAsync(WebApplication app)
-{
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await context.Database.MigrateAsync();
-
-}
