@@ -8,6 +8,7 @@ namespace LMS_API.Data
         public DbSet<Teacher> Teacher { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
         public DbSet<AssignmentSet> AssignmentSets { get; set; }
+        public DbSet<Student> Students { get; set; }
 
         // MANY-TO-MANY relation between Assignment and AssignmentSet
         public DbSet<AssignmentAssignmentSet> AssignmentAssignmentSets { get; set; }
@@ -94,6 +95,29 @@ namespace LMS_API.Data
                 {
                     AssignmentId = 1,
                     AssignmentSetId = 1
+                }
+            );
+
+            modelBuilder.Entity<Student>().HasData(
+                new Student
+                {
+                    Id = 1,
+                    FirstName = "Shoaib",
+                    LastName = "Ali",
+                    Email = "shoaib.ali@student.ucl.dk",
+                    Password = "hashed_password",
+                    CreatedDate = new DateTime(2026, 4, 7),
+                    UpdatedDate = new DateTime(2026, 4, 7)
+                },
+                new Student
+                {
+                    Id = 2,
+                    FirstName = "Imran",
+                    LastName = "Khan",
+                    Email = "imran.khan@student.ucl.dk",
+                    Password = "hashed_password",
+                    CreatedDate = new DateTime(2026, 4, 7),
+                    UpdatedDate = new DateTime(2026, 4, 7)
                 }
             );
         }
