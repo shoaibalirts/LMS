@@ -3,9 +3,8 @@
     <div class="container">
       <div class="header">
         <div>
-          <p class="badge">Task Set Builder</p>
-          <h1>Dine opgaver</h1>
-          <p class="subtitle">Vaelg opgaverne du vil bruge i et opgavesaet.</p>
+          <h1>Dine opgavesæt</h1>
+          <p class="subtitle">Vaelg opgavesættene du vil bruge.</p>
         </div>
         <button class="refresh-btn" @click="loadAssignments" :disabled="loading">
           {{ loading ? 'Indlaeser...' : 'Opdater liste' }}
@@ -14,10 +13,10 @@
 
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
 
-      <div v-if="loading" class="state">Henter opgaver...</div>
+      <div v-if="loading" class="state">Henter opgavesæt...</div>
 
       <div v-else-if="assignments.length === 0" class="state">
-        Ingen opgaver fundet for denne laerer endnu.
+        Du har ingen oprettede opgavesæt
       </div>
 
       <div v-else class="grid">
