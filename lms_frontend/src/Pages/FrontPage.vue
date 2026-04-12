@@ -69,9 +69,6 @@
   </div>
 </template>
 
-<script setup>
-</script>
-
 <style scoped>
 .page-shell {
   width: 100%;
