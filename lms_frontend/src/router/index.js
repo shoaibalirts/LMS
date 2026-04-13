@@ -10,9 +10,14 @@ import FrontPage from '../Pages/FrontPage.vue';
 import TaskCreation from '../Pages/TaskCreation.vue';
 import TasksetCreation from '../Pages/TasksetCreation.vue';
 import { getAuthSession } from '../Services/api';
+import StudentLogin from '../Pages/StudentLogin.vue';
+import StudentDashbboard from '../Pages/StudentDashbboard.vue';
+
 const routes = [
   { path: '/', name: 'FrontPage', component: FrontPage, meta: { guestOnly: true } },
   { path: '/login', name: 'Login', component: Login, meta: { guestOnly: true } },
+  { path: '/student-login', name: 'StudentLogin', component: StudentLogin, meta: { guestOnly: true } },
+  { path: '/student-dashboard', name: 'StudentDashboard', component: StudentDashbboard, meta: { requiresAuth: true, requiresStudent: true } },
   { path: '/register', name: 'Register', component: Register, meta: { guestOnly: true } },
   { path: '/teacher-dashboard', name: 'TeacherDashboard', component: TeacherDashboard, meta: { requiresAuth: true, requiresTeacher: true } },
   { path: '/create-studyclass', name: 'StudyClassCreation', component: StudyClassCreation, meta: { requiresAuth: true, requiresTeacher: true } },
@@ -49,6 +54,11 @@ router.beforeEach((to) => {
 
   // Require teacher role
   if (to.meta.requiresTeacher && role !== 'teacher') {
+    return '/';
+  }
+
+  // Require student role
+  if (to.meta.requiresStudent && role !== 'student') {
     return '/';
   }
 
