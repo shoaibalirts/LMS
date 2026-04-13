@@ -20,7 +20,7 @@ namespace LMS_API.Mappings
             CreateMap<StudentCreateDTO, Student>();
             CreateMap<Student, StudentReadDTO>();
 
-            CreateMap<AssignmentSet, AssignmentSetCreateDTO>();
+            CreateMap<AssignmentSetCreateDTO, AssignmentSet>();
             CreateMap<AssignmentSet, AssignmentSetReadDTO>()
                 .ForMember(dest => dest.Assignments,
                     opt => opt.MapFrom(src => src.AssignmentAssignmentSets.Select(x => x.Assignment)));

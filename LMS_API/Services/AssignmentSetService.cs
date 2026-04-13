@@ -57,7 +57,33 @@ namespace LMS_API.Services
         }       
         public async Task<bool> AddAssignmentToSetAsync(int assignmentSetId, int assignmentId, int teacherId)
         {
-            return false;
+            try
+            {
+                var assignmentSet = await _db.AssignmentSets
+                    .FirstOrDefaultAsync(x => x.Id == assignmentSetId && x.TeacherId == teacherId);
+                if (assignmentSet == null) return false;
+
+                var assignment = await _db.Assignments
+                    .FirstOrDefaultAsync(x => x.Id == assignmentId && x.TeacherId == teacherId);
+                if (assignment == null) return false;
+
+                var alreadyLinked = await _db.AssignmentAssignmentSets
+                    .AnyAsync(x => x.AssignmentSetId == assignmentSetId && x.AssignmentId == assignmentId);
+                if (alreadyLinked) return true;
+
+                await _db.AssignmentAssignmentSets.AddAsync(new AssignmentAssignmentSet
+                {
+                    AssignmentSetId = assignmentSetId,
+                    AssignmentId = assignmentId
+                });
+
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }
