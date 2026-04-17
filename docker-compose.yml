@@ -27,7 +27,7 @@ services:
 
   # 3. Frontend Service
   web:
-    build: ./frontend
+    build: ./lms_frontend
     # Name the image for your Docker Hub repo
     image: shoaibali808/my-vue-frontend:latest
     container_name: vue_frontend
