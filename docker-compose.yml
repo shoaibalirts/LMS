@@ -30,7 +30,7 @@ services:
   web:
     build: ./lms_frontend
     # Name the image for your Docker Hub repo
-    image: shoaibali808/my-vue-frontend:latest
+    image: shoaibali808/vue-lms-frontend:latest
     container_name: vue_frontend
     ports:
       - "80:80"
