@@ -7,10 +7,10 @@ namespace LMS_API.Models
     {
         public int AssignmentId { get; set; }
         [JsonIgnore]
-        public Assignment Assignment { get; set; }
+        public Assignment? Assignment { get; set; }
 
         public int AssignmentSetId { get; set; }
         [JsonIgnore]
-        public AssignmentSet AssignmentSet { get; set; }
+        public AssignmentSet? AssignmentSet { get; set; }
     }
 }

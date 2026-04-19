@@ -122,7 +122,7 @@ async function handleLogin() {
   try {
     const data = await LoginTeacher(email.value, password.value);
 
-    if (!data?.token) {
+    if (!data?.token && !data?.Token) {
       status.value = 'invalid';
       return;
     }

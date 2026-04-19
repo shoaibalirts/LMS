@@ -5,7 +5,7 @@ namespace LMS_API.Models.DTO.AssignmentSet
     public class AssignmentSetReadDTO
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public List<AssignmentReadDTO> Assignments { get; set; } = new();
     }
 }

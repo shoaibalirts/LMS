@@ -26,8 +26,6 @@ namespace LMS_API.Mappings
                 .ForMember(dest => dest.Assignments,
                     opt => opt.MapFrom(src => src.AssignmentAssignmentSets.Select(x => x.Assignment)));
 
-            CreateMap<StudyClass, StudyClassCreateDTO>();
-
             CreateMap<StudyClass, StudyClassReadDTO>()
                 .ForMember(dest => dest.Students,
                     opt => opt.MapFrom(src => src.StudentStudyClasses.Select(x => x.Student)));

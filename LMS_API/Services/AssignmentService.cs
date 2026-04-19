@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using LMS_API.Data;
 using LMS_API.Models;
 using LMS_API.Models.DTO.Assignment;
@@ -11,11 +11,13 @@ namespace LMS_API.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
+        private readonly IFileStorageService _fileStorage;
 
-        public AssignmentService(ApplicationDbContext db, IMapper mapper)
+        public AssignmentService(ApplicationDbContext db, IMapper mapper, IFileStorageService fileStorage)
         {
             _db = db;
             _mapper = mapper;
+            _fileStorage = fileStorage;
         }
 
         public async Task<AssignmentReadDTO?> CreateAssignmentAsync(AssignmentCreateDTO assignmentDTO, int teacherId)
@@ -24,12 +26,22 @@ namespace LMS_API.Services
             {
                 if (assignmentDTO == null) return null;
 
+                string? pictureUrl = null;
+                if (assignmentDTO.PictureFile != null)
+                {
+                    pictureUrl = await _fileStorage.SaveAsync(assignmentDTO.PictureFile);
+                    if (pictureUrl == null)
+                        return null;
+                }
+
                 Assignment assignment = _mapper.Map<Assignment>(assignmentDTO);
+                assignment.PictureUrl = pictureUrl;
                 assignment.CreatedDate = DateTime.Now;
-            assignment.TeacherId = teacherId;
+                assignment.TeacherId = teacherId;
 
                 await _db.Assignments.AddAsync(assignment);
                 await _db.SaveChangesAsync();
+
                 return _mapper.Map<AssignmentReadDTO>(assignment);
             }
             catch (Exception)
@@ -62,7 +74,9 @@ namespace LMS_API.Services
                     .FirstOrDefaultAsync(a => a.Id == id && a.TeacherId == teacherId);
                 if (assignment == null) return false;
 
-                // Remove links in join table first
+                if (assignment.PictureUrl != null)
+                    _fileStorage.Delete(assignment.PictureUrl);
+
                 var links = _db.AssignmentAssignmentSets.Where(x => x.AssignmentId == id);
                 _db.AssignmentAssignmentSets.RemoveRange(links);
 

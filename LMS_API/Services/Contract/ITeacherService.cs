@@ -5,7 +5,7 @@ namespace LMS_API.Services.Contract
 {
     public interface ITeacherService
     {
-        Task<Teacher> RegisterTeacherAsync(TeacherCreateDTO teacherDTO);
+        Task<Teacher?> RegisterTeacherAsync(TeacherCreateDTO teacherDTO);
         Task<Teacher?> AuthenticateAsync(TeacherLoginDTO loginDTO);
     }
 }

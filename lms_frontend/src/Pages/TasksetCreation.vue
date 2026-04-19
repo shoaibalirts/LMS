@@ -65,7 +65,7 @@
             </div>
             <img
               v-if="task.pictureUrl || task.PictureUrl"
-              :src="task.pictureUrl || task.PictureUrl"
+              :src="getAssetUrl(task.pictureUrl || task.PictureUrl)"
               alt="Task image"
               class="task-image"
             />
@@ -104,7 +104,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue';
-import { AddAssignmentToAssignmentSet, CreateAssignmentSet, GetTeacherAssignments } from '../Services/api';
+import { AddAssignmentToAssignmentSet, CreateAssignmentSet, GetTeacherAssignments, getAssetUrl } from '../Services/api';
 
 const loading = ref(false);
 const saving = ref(false);

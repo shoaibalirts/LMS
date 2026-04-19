@@ -6,10 +6,10 @@ namespace LMS_API.Models
     {
         public int StudentId { get; set; }
         [JsonIgnore]
-        public Student Student { get; set; }
+        public Student? Student { get; set; }
 
         public int StudyClassId { get; set; }
         [JsonIgnore]
-        public StudyClass StudyClass { get; set; }
+        public StudyClass? StudyClass { get; set; }
     }
 }

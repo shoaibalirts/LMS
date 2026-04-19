@@ -1,30 +1,31 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace LMS_API.Models.DTO.Assignment
 {
     public class AssignmentCreateDTO
     {
-        [Required(ErrorMessage = "Points of the assignment is required")]
-        [Range(0, 1000)]
-        public decimal Points { get; set; }
+        [Required(ErrorMessage = "Points is required")]
+        [Range(0, 10)]
+        public int Points { get; set; }
 
-        [Required(ErrorMessage = "Type of the assignment is required")]
+        [Required(ErrorMessage = "Type is required")]
         [MaxLength(50)]
-        public string Type { get; set; } // 'Delprøve 1', 'Delprøve 2'
+        public required string Type { get; set; }
 
-        [Required(ErrorMessage = "Class level of the assignment is required")]
+        [Required(ErrorMessage = "Class level is required")]
         [MaxLength(20)]
-        public string ClassLevel { get; set; } // 'A, B or C'
+        public required string ClassLevel { get; set; }
 
-        [Required(ErrorMessage = "Subject of the assignment is required")]
+        [Required(ErrorMessage = "Subject is required")]
         [MaxLength(100)]
-        public string Subject { get; set; }
+        public required string Subject { get; set; }
 
-        [MaxLength(500)]
-        public string? PictureUrl { get; set; }
-        
+        public IFormFile? PictureFile { get; set; }
+
         [MaxLength(500)]
         public string? VideoUrl { get; set; }
-        
+
+        [MaxLength(2000)]
+        public string? Result { get; set; }
     }
 }

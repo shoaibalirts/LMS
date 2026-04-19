@@ -28,6 +28,12 @@ namespace LMS_API.Controllers
                 {
                     return BadRequest("Teacher data is required");
                 }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
                 var teacher = await _teacherService.RegisterTeacherAsync(teacherDTO);
                 if (teacher == null)
                 {

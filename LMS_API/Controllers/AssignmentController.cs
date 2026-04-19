@@ -22,7 +22,7 @@ namespace LMS_API.Controllers
         
 
         [HttpPost]
-        public async Task<ActionResult<AssignmentReadDTO>> CreateAssignment(AssignmentCreateDTO assignmentDTO)
+        public async Task<ActionResult<AssignmentReadDTO>> CreateAssignment([FromForm] AssignmentCreateDTO assignmentDTO)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace LMS_API.Controllers
                 var assignment = await _assignmentService.CreateAssignmentAsync(assignmentDTO, teacherId);
                 if (assignment == null)
                 {
-                    return BadRequest("Could not create assignment.");
+                    return BadRequest("Could not create assignment. Check that the image is a valid type (jpg, png, gif, webp) and under 10 MB.");
                 }
                 return CreatedAtAction(nameof(CreateAssignment), new { id = assignment.Id }, assignment);// instead of Ok
             }

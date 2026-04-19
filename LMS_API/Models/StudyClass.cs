@@ -14,7 +14,7 @@ namespace LMS_API.Models
         // ONE Teacher → MANY StudyClasses
         public int TeacherId { get; set; }
         [JsonIgnore]
-        public Teacher Teacher { get; set; }
+        public Teacher? Teacher { get; set; }
 
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }

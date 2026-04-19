@@ -39,12 +39,9 @@ router.beforeEach((to) => {
 
   // Guest-only pages
   if (to.meta.guestOnly && loggedIn) {
-    // Redirect teachers to dashboard - in future redirect students to /student-dashboard
-    if (role === 'teacher') {
-      return '/teacher-dashboard';
-    }
-    // Redirect other logged-in users to a default page
-    return '/'; 
+    if (role === 'teacher') return '/teacher-dashboard';
+    if (role === 'student') return '/student-dashboard';
+    return '/teacher-dashboard';
   }
 
   // Require login
