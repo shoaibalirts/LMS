@@ -3,6 +3,7 @@ services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sql_server_db
+    restart: unless-stopped
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=ShoaibLovesHerMother-@Fkrs1234
@@ -17,6 +18,7 @@ services:
     # Name the image so it's ready to push to your Docker Hub repo
     image: shoaibali808/csharp-lms-webapi:latest 
     container_name: csharp_webapi
+    restart: unless-stopped
     ports:
       - "8080:8080" # Map host port to container port
     environment:
@@ -32,6 +34,7 @@ services:
     # Name the image for your Docker Hub repo
     image: shoaibali808/vue-lms-frontend:latest
     container_name: vue_frontend
+    restart: unless-stopped
     ports:
       - "80:80"
     depends_on:
