@@ -1,5 +1,12 @@
 const API_BASE_URL = 'http://localhost:5294/api';
+const API_ORIGIN = 'http://localhost:5294';
 const AUTH_STORAGE_KEY = 'auth';
+
+export function getAssetUrl(path) {
+  if (!path) return null;
+  if (path.startsWith('http')) return path;
+  return `${API_ORIGIN}${path}`;
+}
 
 export function getAuthSession() {
   try {
@@ -58,11 +65,9 @@ function getUserIdFromToken() {
   return Number.isInteger(userId) ? userId : null;
 }
 
-function buildHeaders(extraHeaders = {}, requiresAuth = false) {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...extraHeaders
-  };
+function buildHeaders(extraHeaders = {}, requiresAuth = false, isFormData = false) {
+  const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
+  Object.assign(headers, extraHeaders);
 
   if (requiresAuth) {
     const token = getAccessToken();
@@ -76,9 +81,10 @@ function buildHeaders(extraHeaders = {}, requiresAuth = false) {
 }
 
 async function request(path, options = {}, requiresAuth = false) {
+  const isFormData = options.body instanceof FormData;
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
-    headers: buildHeaders(options.headers, requiresAuth)
+    headers: buildHeaders(options.headers, requiresAuth, isFormData)
   });
 
   if (response.status === 401) {
@@ -127,9 +133,18 @@ export async function LoginStudent(email, password) {
 }
 
 export async function CreateAssignment(data) {
+  const formData = new FormData();
+  formData.append('Points', data.Points);
+  formData.append('Type', data.Type);
+  formData.append('ClassLevel', data.ClassLevel);
+  formData.append('Subject', data.Subject);
+  if (data.PictureFile) formData.append('PictureFile', data.PictureFile);
+  if (data.VideoUrl) formData.append('VideoUrl', data.VideoUrl);
+  if (data.Result) formData.append('Result', data.Result);
+
   return await request('/assignment', {
     method: 'POST',
-    body: JSON.stringify(data)
+    body: formData
   }, true);
 }
 
