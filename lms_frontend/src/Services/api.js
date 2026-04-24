@@ -47,6 +47,17 @@ function getTeacherIdFromToken() {
   return Number.isInteger(teacherId) ? teacherId : null;
 }
 
+function getUserIdFromToken() {
+  const token = getAccessToken();
+  if (!token) return null;
+
+  const payload = parseJwtPayload(token);
+  const userIdRaw = payload?.nameid ?? payload?.sub;
+  const userId = Number(userIdRaw);
+
+  return Number.isInteger(userId) ? userId : null;
+}
+
 function buildHeaders(extraHeaders = {}, requiresAuth = false) {
   const headers = {
     'Content-Type': 'application/json',
@@ -207,3 +218,96 @@ export async function AddStudentsToStudyClass(studyClassId, studentIds) {
     body: JSON.stringify({ id: studyClassId, studentIds })
   }, true);
 }
+
+export async function CreateAssignedAssignmentSet(data) {
+  return await request('/assignedassignment/sets', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }, true);
+}
+
+export async function GetStudentAssignedAssignmentSets() {
+  return await request('/assignedassignment/student', {
+    method: 'GET'
+  }, true);
+}
+
+export async function GetTeacherAssignedAssignmentSets() {
+  return await request('/assignedassignment/teacher', {
+    method: 'GET'
+  }, true);
+}
+
+export async function UploadAssignedAssignmentResult(assignedAssignmentId, file) {
+  const token = getAccessToken();
+  if (!token) {
+    throw new Error('Missing authentication token. Please log in again.');
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await fetch(`${API_BASE_URL}/assignedassignment/${assignedAssignmentId}/submit`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData
+  });
+
+  if (response.status === 401) {
+    clearAuthSession();
+    throw new Error('Unauthorized. Please log in again.');
+  }
+
+  if (!response.ok) {
+    const text = await response.text();
+    const error = new Error(text || `Request failed (${response.status})`);
+    error.status = response.status;
+    throw error;
+  }
+
+  return await response.json();
+}
+
+export async function UpdateAssignedAssignmentFeedback(assignedAssignmentId, feedback) {
+  return await request(`/assignedassignment/${assignedAssignmentId}/feedback`, {
+    method: 'PUT',
+    body: JSON.stringify({ feedback })
+  }, true);
+}
+
+export async function DownloadAssignedAssignmentResult(assignedAssignmentId) {
+  const token = getAccessToken();
+  if (!token) {
+    throw new Error('Missing authentication token. Please log in again.');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/assignedassignment/${assignedAssignmentId}/result`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (response.status === 401) {
+    clearAuthSession();
+    throw new Error('Unauthorized. Please log in again.');
+  }
+
+  if (!response.ok) {
+    const text = await response.text();
+    const error = new Error(text || `Request failed (${response.status})`);
+    error.status = response.status;
+    throw error;
+  }
+
+  const blob = await response.blob();
+  const contentDisposition = response.headers.get('content-disposition') || '';
+  const match = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i.exec(contentDisposition);
+  const fileName = decodeURIComponent(match?.[1] || match?.[2] || `submission-${assignedAssignmentId}.pdf`);
+
+  return { blob, fileName };
+}
+
+export { getUserIdFromToken };

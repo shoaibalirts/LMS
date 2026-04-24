@@ -23,6 +23,9 @@ namespace LMS_API.Models
         [JsonIgnore]
         public Teacher? CreatedByTeacher { get; set; }
 
+        [JsonIgnore]
+        public ICollection<AssignedAssignmentSet> AssignedAssignmentSets { get; set; } = new List<AssignedAssignmentSet>();
+
         public ICollection<StudentStudyClass> StudentStudyClasses { get; set; } = new List<StudentStudyClass>();    
     }
 }

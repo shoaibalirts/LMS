@@ -41,7 +41,8 @@ namespace LMS_API.Models
         [JsonIgnore]
         public Teacher Teacher { get; set; }
 
-
+        [JsonIgnore]
+        public ICollection<AssignedAssignment> AssignedAssignments { get; set; } = new List<AssignedAssignment>();
 
         // MANY-TO-MANY
         [JsonIgnore]

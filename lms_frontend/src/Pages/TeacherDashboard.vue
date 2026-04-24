@@ -50,7 +50,10 @@
             <span>📝</span> Opret opgave
           </router-link>
           <router-link to="/create-taskset" class="action-btn">
-            <span>�</span> Opret opgavesæt
+            <span>📚</span> Opret opgavesæt
+          </router-link>
+          <router-link to="/assigned-submissions" class="action-btn">
+            <span>✅</span> Tildel og bedøm afleveringer
           </router-link>
         </div>
       </div>

@@ -9,6 +9,7 @@ import TeacherDashboard from '../Pages/TeacherDashboard.vue';
 import FrontPage from '../Pages/FrontPage.vue';
 import TaskCreation from '../Pages/TaskCreation.vue';
 import TasksetCreation from '../Pages/TasksetCreation.vue';
+import AssignedSubmissions from '../Pages/AssignedSubmissions.vue';
 import { getAuthSession } from '../Services/api';
 import StudentLogin from '../Pages/StudentLogin.vue';
 import StudentDashbboard from '../Pages/StudentDashbboard.vue';
@@ -24,7 +25,8 @@ const routes = [
   { path: '/studyclass/:id', name: 'StudyClassDetails', component: StudyClassDetails, meta: { requiresAuth: true, requiresTeacher: true } },
   { path: '/register-student', name: 'RegisterStudent', component: RegisterStudent, meta: { requiresAuth: true, requiresTeacher: true } },
   { path: '/create-task', name: 'TaskCreation', component: TaskCreation, meta: { requiresAuth: true, requiresTeacher: true } },
-  { path: '/create-taskset', name: 'TasksetCreation', component: TasksetCreation, meta: { requiresAuth: true, requiresTeacher: true } }
+  { path: '/create-taskset', name: 'TasksetCreation', component: TasksetCreation, meta: { requiresAuth: true, requiresTeacher: true } },
+  { path: '/assigned-submissions', name: 'AssignedSubmissions', component: AssignedSubmissions, meta: { requiresAuth: true, requiresTeacher: true } }
 ];
 
 const router = createRouter({

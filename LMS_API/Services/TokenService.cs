@@ -56,10 +56,14 @@ namespace LMS_API.Services
 
         public bool TryGetTeacherId(ClaimsPrincipal user, out int teacherId)
         {
-            teacherId = default;
+            return TryGetUserId(user, out teacherId);
+        }
 
-            var teacherIdClaim = user.FindFirstValue(ClaimTypes.NameIdentifier);
-            return int.TryParse(teacherIdClaim, out teacherId);
+        public bool TryGetUserId(ClaimsPrincipal user, out int userId)
+        {
+            userId = default;
+            var userIdClaim = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(userIdClaim, out userId);
         }
     }
 }

@@ -33,6 +33,9 @@ namespace LMS_API.Models
         public ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
 
         [JsonIgnore]
+        public ICollection<AssignedAssignmentSet> AssignedAssignmentSets { get; set; } = new List<AssignedAssignmentSet>();
+
+        [JsonIgnore]
         public ICollection<Student> CreatedStudents { get; set; } = new List<Student>();
     }
 }

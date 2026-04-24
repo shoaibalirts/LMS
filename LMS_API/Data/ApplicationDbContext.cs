@@ -9,6 +9,8 @@ namespace LMS_API.Data
         public DbSet<Assignment> Assignments { get; set; }
         public DbSet<AssignmentSet> AssignmentSets { get; set; }
         public DbSet<Student> Students { get; set; }
+        public DbSet<AssignedAssignmentSet> AssignedAssignmentSets { get; set; }
+        public DbSet<AssignedAssignment> AssignedAssignments { get; set; }
 
         public DbSet<StudyClass> StudyClasses { get; set; }
         public DbSet<StudentStudyClass> StudentStudyClasses { get; set; }
@@ -80,6 +82,38 @@ namespace LMS_API.Data
                 .HasOne(s => s.CreatedByTeacher)
                 .WithMany(t => t.CreatedStudents)
                 .HasForeignKey(s => s.CreatedByTeacherId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // -------------------------
+            // Teacher -> AssignedAssignmentSet (1:M)
+            // Student -> AssignedAssignmentSet (1:M)
+            // -------------------------
+            modelBuilder.Entity<AssignedAssignmentSet>()
+                .HasOne(x => x.Teacher)
+                .WithMany(t => t.AssignedAssignmentSets)
+                .HasForeignKey(x => x.TeacherId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<AssignedAssignmentSet>()
+                .HasOne(x => x.Student)
+                .WithMany(s => s.AssignedAssignmentSets)
+                .HasForeignKey(x => x.StudentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // -------------------------
+            // AssignedAssignmentSet -> AssignedAssignment (1:M)
+            // Assignment -> AssignedAssignment (1:M)
+            // -------------------------
+            modelBuilder.Entity<AssignedAssignment>()
+                .HasOne(x => x.AssignedAssignmentSet)
+                .WithMany(x => x.AssignedAssignments)
+                .HasForeignKey(x => x.AssignedAssignmentSetId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AssignedAssignment>()
+                .HasOne(x => x.Assignment)
+                .WithMany(a => a.AssignedAssignments)
+                .HasForeignKey(x => x.AssignmentId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             // -------------------------
