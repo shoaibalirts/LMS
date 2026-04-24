@@ -155,15 +155,32 @@ async function loadPage() {
 	status.value = '';
 
 	try {
-		const [studentData, assignmentData, assignedData] = await Promise.all([
+		const [studentData, assignmentData, assignedData] = await Promise.allSettled([
 			GetTeacherStudents(),
 			GetTeacherAssignments(),
 			GetTeacherAssignedAssignmentSets()
 		]);
 
-		students.value = Array.isArray(studentData) ? studentData : [];
-		assignments.value = Array.isArray(assignmentData) ? assignmentData : [];
-		assignedSets.value = Array.isArray(assignedData) ? assignedData : [];
+		students.value =
+			studentData.status === 'fulfilled' && Array.isArray(studentData.value)
+				? studentData.value
+				: [];
+
+		assignments.value =
+			assignmentData.status === 'fulfilled' && Array.isArray(assignmentData.value)
+				? assignmentData.value
+				: [];
+
+		assignedSets.value =
+			assignedData.status === 'fulfilled' && Array.isArray(assignedData.value)
+				? assignedData.value
+				: [];
+
+		if (assignedData.status === 'rejected') {
+			status.value = assignedData.reason?.message || 'Kunne ikke hente eksisterende tildelinger. Du kan stadig oprette nye.';
+			statusType.value = 'error';
+		}
+
 		normalizeFeedbackDrafts();
 	} catch (error) {
 		status.value = error?.message || 'Kunne ikke hente data.';
