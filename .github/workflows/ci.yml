@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  backend:
+    name: Backend (.NET)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Restore
+        run: dotnet restore LMS_API/LMS_API.csproj
+
+      - name: Build
+        run: dotnet build LMS_API/LMS_API.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test LMS_API_UnitTest/LMS_API_UnitTest.csproj --configuration Release --no-restore
+
+  frontend:
+    name: Frontend (Vite)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lms_frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.19.0"
+          cache: "npm"
+          cache-dependency-path: lms_frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
