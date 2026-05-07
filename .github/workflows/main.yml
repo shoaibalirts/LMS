@@ -1,0 +1,101 @@
+name: Claude AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches-ignore:
+      - main
+      - master
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  code-review:
+    name: AI Code Review
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install @anthropic-ai/sdk
+
+      - name: Get changed files and diff
+        id: diff
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE="${{ github.event.before }}"
+            HEAD="${{ github.event.after }}"
+          fi
+
+          echo "base=$BASE" >> $GITHUB_OUTPUT
+          echo "head=$HEAD" >> $GITHUB_OUTPUT
+
+          # Get changed files (excluding lock files and binary files)
+          git diff --name-only $BASE $HEAD \
+            | grep -v -E '(package-lock\.json|yarn\.lock|pnpm-lock\.yaml|\.png|\.jpg|\.jpeg|\.gif|\.ico|\.svg|\.woff|\.woff2|\.ttf|\.eot)$' \
+            > changed_files.txt
+
+          echo "Changed files:"
+          cat changed_files.txt
+
+          # Get the full diff (limit to 50,000 chars to stay within token limits)
+          git diff $BASE $HEAD -- $(cat changed_files.txt | tr '\n' ' ') \
+            | head -c 50000 > code_diff.txt
+
+          echo "Diff size: $(wc -c < code_diff.txt) bytes"
+
+      - name: Run Claude Code Review
+        id: review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: node .github/scripts/claude-review.js
+
+      - name: Post review comment (Pull Request)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const review = fs.readFileSync('review_output.md', 'utf8');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: review
+            });
+
+      - name: Post review as job summary (Push)
+        if: github.event_name == 'push'
+        run: |
+          cat review_output.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Check for blocking issues
+        run: |
+          if grep -q "🔴 BLOCKING" review_output.md; then
+            echo "❌ Claude found blocking issues in this code. Please review the feedback."
+            exit 1
+          else
+            echo "✅ No blocking issues found."
+          fi
