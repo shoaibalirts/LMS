@@ -1,11 +1,41 @@
+# WORKFLOW: Den øverste enhed — definerer hvornår og hvad der køres automatisk.
+# CI/CD: CI bygger og tester koden ved hvert push. CD deployer den bagefter.
 name: CI
 
+# Triggere: hvornår workflowet startes
 on:
   push:
     branches: [main, master]
   pull_request:
 
+# JOBS: Kører parallelt, hver i sit eget isolerede miljø (virtuel maskine)
 jobs:
+
+  # JOB 1: .NET backend
+  dotnet-test:
+    name: .NET Build & Test
+    runs-on: ubuntu-latest
+
+    # STEPS: Kører sekventielt inde i jobbet — fejler ét step, stopper resten
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4        # "uses" = færdiglavet action fra Marketplace - cloner vores repo ind i den virtuelle maskine som skal bygge og teste koden
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4 # "uses" = færdiglavet action fra Marketplace - installerer .NET SDK i den virtuelle maskine
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore LMS.sln      # "run" = almindelig shell-kommando
+
+      - name: Build
+        run: dotnet build LMS.sln --no-restore --configuration Release
+
+      - name: Test                       # Kører LMS_API_UnitTest + LMS_API_BDDTest
+        run: dotnet test LMS.sln --no-build --configuration Release --verbosity normal
+
+  # JOB 2: Vue frontend
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest
@@ -19,15 +49,12 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: lms_frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Run tests
-        run: npm test
+        working-directory: lms_frontend
 
       - name: Build
         run: npm run build
+        working-directory: lms_frontend

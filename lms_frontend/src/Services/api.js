@@ -1,5 +1,5 @@
-const API_BASE_URL = 'http://localhost:5294/api';
-const API_ORIGIN = 'http://localhost:5294';
+const API_BASE_URL = 'http://localhost:8080/api';
+const API_ORIGIN = 'http://localhost:8080';
 const AUTH_STORAGE_KEY = 'auth';
 
 export function getAssetUrl(path) {
