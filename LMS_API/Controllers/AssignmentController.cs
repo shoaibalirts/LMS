@@ -14,11 +14,13 @@ namespace LMS_API.Controllers
     {
         private readonly IAssignmentService _assignmentService;
         private readonly ITokenService _tokenService;
+        private readonly ILogger<AssignmentController> _logger;
 
-        public AssignmentController(IAssignmentService assignmentService, ITokenService tokenService) 
+        public AssignmentController(IAssignmentService assignmentService, ITokenService tokenService, ILogger<AssignmentController> logger)
         {
             _assignmentService = assignmentService;
             _tokenService = tokenService;
+            _logger = logger;
         }
         
 
@@ -37,7 +39,6 @@ namespace LMS_API.Controllers
                     return ValidationProblem(ModelState);
                 }
 
-                Console.WriteLine($"PictureFile: {Request.Form.Files["PictureFile"]?.FileName ?? "NULL"}");
                 if (!_tokenService.TryGetTeacherId(User, out var teacherId))
                 {
                     return Unauthorized("Missing or invalid teacher identity.");
@@ -48,6 +49,9 @@ namespace LMS_API.Controllers
                 {
                     return BadRequest("Could not create assignment.");
                 }
+
+                _logger.LogInformation("Assignment created teacher_id={TeacherId} assignment_id={AssignmentId}", teacherId, assignment.Id);
+
                 return CreatedAtAction(nameof(CreateAssignment), new { id = assignment.Id }, assignment);// instead of Ok
             }
             catch (InvalidOperationException ex)
@@ -96,10 +100,12 @@ namespace LMS_API.Controllers
 
             var deleted = await _assignmentService.DeleteAssignmentAsync(id, teacherId);
 
-            if (!deleted) 
+            if (!deleted)
             {
                 return NotFound($"Assignment with ID {id} not found.");
             }
+
+            _logger.LogInformation("Assignment deleted teacher_id={TeacherId} assignment_id={AssignmentId}", teacherId, id);
 
             return Ok(new { message = $"Record deleted with ID: {id}" });
         }

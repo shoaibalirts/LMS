@@ -5,6 +5,7 @@ using LMS_API.Models;
 using LMS_API.Models.DTO.Student;
 using LMS_API.Services.Contract;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Reqnroll;
 
@@ -15,12 +16,13 @@ public class CreateStudentSteps
 {
     private readonly Mock<IStudentService> _studentService = new();
     private readonly Mock<ITokenService> _tokenService = new();
+    private readonly Mock<ILogger<StudentController>> _logger = new();
     private readonly StudentController _controller;
     private ActionResult<StudentReadDTO> _result = null!;
 
     public CreateStudentSteps()
     {
-        _controller = new StudentController(_studentService.Object, _tokenService.Object);
+        _controller = new StudentController(_studentService.Object, _tokenService.Object, _logger.Object);
     }
 
     [Given("a teacher is authenticated")]

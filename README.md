@@ -57,6 +57,10 @@ Frontend runs at http://localhost:5173
 | Prometheus | http://localhost:9090 | Metrics collection and storage |
 | Grafana | http://localhost:3000 | Dashboards and visualization |
 | Node Exporter | http://localhost:9100 | Host machine metrics |
+| Loki | http://localhost:3100 | Log aggregation and storage |
+| Promtail | — | Log collector (no UI) |
+
+All the services and its ports can be found in docker-compose.yml.
 
 ### Service Details
 
@@ -68,22 +72,23 @@ Frontend runs at http://localhost:5173
 
 **prometheus** — Scrapes metrics every 15 seconds from the API and node-exporter. Config lives in `prometheus.yml`.
 
-**grafana** — Visualisation dashboards. Default login is `admin` / `admin`. Data persisted in the `grafana_data` Docker volume.
+**grafana** — Visualisation dashboards. Default login is `admin` / `admin`. Data persisted in the `grafana_data` Docker volume. Prometheus and Loki are auto-provisioned as data sources via `grafana/provisioning/datasources/datasources.yml`.
 
 **node-exporter** — Exposes host machine metrics (CPU, memory, disk, network) to Prometheus.
+
+**loki** — Stores and indexes logs shipped by Promtail. Queried from Grafana using LogQL.
+
+**promtail** — Tails Docker container logs and ships them to Loki. Config lives in `promtail-config.yml`.
 
 ---
 
 ## Grafana Setup
 
-### 1. Add Prometheus as a data source
+Data sources (**Prometheus** and **Loki**) and dashboards are provisioned automatically on startup — no manual setup needed. After logging in (`admin` / `admin`), both data sources and the **LMS** dashboard folder will already be available.
 
-1. Go to http://localhost:3000 and log in (`admin` / `admin`)
-2. Connections → Data sources → Add data source → Prometheus
-3. URL: `http://prometheus:9090`
-4. Click **Save & test**
+Dashboards are loaded from `grafana/provisioning/dashboards/`. Any `.json` file placed there will be auto-imported on startup. To update a dashboard, export it as code from Grafana and overwrite the existing `.json` file, then restart the container.
 
-### 2. Create a dashboard
+### Create a dashboard (if starting from scratch)
 
 Dashboards → New → New dashboard → Add visualization
 
@@ -119,6 +124,29 @@ rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds
 ```promql
 100 - ((node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100)
 ```
+
+### Log Queries (Loki / LogQL)
+
+**API logs (all)**
+```logql
+{container="csharp_webapi"} |= ``
+```
+
+**API logs (errors only)**
+```logql
+{container="csharp_webapi"} |= `error`
+```
+
+**Frontend logs (all)**
+```logql
+{container="vue_frontend"} |= ``
+```
+
+**Frontend logs (errors only)**
+```logql
+{container="vue_frontend"} |= `error`
+```
+
 
 ## Grafana Alerts
 
@@ -167,11 +195,3 @@ sum(rate(http_requests_received_total{code=~"4..|5.."}[5m])) / sum(rate(http_req
 **Description:** `Memory usage has exceeded 85% for more than 5 minutes.`
 
 ---
-
-## Verify Prometheus is scraping
-
-Open http://localhost:9090/targets — all three jobs should show **UP**:
-
-- `lms-api` — the ASP.NET Core API
-- `node-exporter` — host machine metrics
-- `prometheus` — Prometheus itself

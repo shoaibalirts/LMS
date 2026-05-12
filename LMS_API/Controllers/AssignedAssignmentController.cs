@@ -15,11 +15,13 @@ namespace LMS_API.Controllers
 	{
 		private readonly IAssignedAssignmentService _assignedAssignmentService;
 		private readonly ITokenService _tokenService;
+		private readonly ILogger<AssignedAssignmentController> _logger;
 
-		public AssignedAssignmentController(IAssignedAssignmentService assignedAssignmentService, ITokenService tokenService)
+		public AssignedAssignmentController(IAssignedAssignmentService assignedAssignmentService, ITokenService tokenService, ILogger<AssignedAssignmentController> logger)
 		{
 			_assignedAssignmentService = assignedAssignmentService;
 			_tokenService = tokenService;
+			_logger = logger;
 		}
 
 		[Authorize(Roles = "Teacher")]
@@ -106,6 +108,8 @@ namespace LMS_API.Controllers
 					return NotFound("Assigned assignment was not found.");
 				}
 
+				_logger.LogInformation("Assignment submitted student_id={StudentId} assignment_id={AssignmentId}", studentId, assignedAssignmentId);
+
 				return Ok(updated);
 			}
 			catch (UnauthorizedAccessException)
@@ -134,6 +138,8 @@ namespace LMS_API.Controllers
 				{
 					return NotFound("Assigned assignment was not found.");
 				}
+
+				_logger.LogInformation("Feedback given teacher_id={TeacherId} assignment_id={AssignmentId}", teacherId, assignedAssignmentId);
 
 				return Ok(updated);
 			}

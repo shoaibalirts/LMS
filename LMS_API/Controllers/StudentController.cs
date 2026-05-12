@@ -13,11 +13,13 @@ namespace LMS_API.Controllers
     {
         private readonly IStudentService _studentService;
         private readonly ITokenService _tokenService;
+        private readonly ILogger<StudentController> _logger;
 
-        public StudentController(IStudentService studentService, ITokenService tokenService)
+        public StudentController(IStudentService studentService, ITokenService tokenService, ILogger<StudentController> logger)
         {
             _studentService = studentService;
             _tokenService = tokenService;
+            _logger = logger;
         }
 
         [Authorize(Roles = "Teacher")]
@@ -44,8 +46,11 @@ namespace LMS_API.Controllers
                 var student = await _studentService.RegisterStudentAsync(studentDTO, teacherId);
                 if (student == null)
                 {
+                    _logger.LogWarning("Student registration conflict email={Email}", studentDTO.Email);
                     return Conflict($"'{studentDTO.Email}' already exists.");
                 }
+
+                _logger.LogInformation("Student registered email={Email}", student.Email);
 
                 var studentReadDTO = new StudentReadDTO
                 {
@@ -97,8 +102,11 @@ namespace LMS_API.Controllers
                 var student = await _studentService.AuthenticateAsync(studentLoginDTO);
                 if (student == null)
                 {
+                    _logger.LogWarning("Failed student login attempt email={Email}", studentLoginDTO.Email);
                     return Unauthorized("Invalid email or password.");
                 }
+
+                _logger.LogInformation("Student logged in email={Email}", student.Email);
 
                 var token = _tokenService.GenerateToken(student.Id, student.Email, "Student");
                 return Ok(new AuthResponseDTO
