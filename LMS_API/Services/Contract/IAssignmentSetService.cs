@@ -9,5 +9,6 @@ namespace LMS_API.Services.Contract
         Task<AssignmentSetReadDTO?> CreateAssignmentSetAsync(AssignmentSetCreateDTO assignmentSetDTO, int teacherId);
         Task<IEnumerable<AssignmentSetReadDTO>> GetAllAssignmentSetsByTeacherAsync(int teacherId);
         Task<bool> AddAssignmentToSetAsync(int assignmentSetId, int assignmentId, int teacherId);
+		Task<bool> DeleteAssignmentSetAsync(int assignmentSetId, int teacherId);
     }
 }

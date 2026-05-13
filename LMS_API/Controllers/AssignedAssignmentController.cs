@@ -54,6 +54,31 @@ namespace LMS_API.Controllers
 			}
 		}
 
+		[Authorize(Roles = "Teacher")]
+		[HttpPost("sets/class")]
+		public async Task<ActionResult<IEnumerable<AssignedAssignmentSetReadDTO>>> CreateAssignedAssignmentSetForClass([FromBody] AssignedAssignmentSetCreateForClassDTO dto)
+		{
+			if (dto == null)
+			{
+				return BadRequest("Assigned class payload is required.");
+			}
+
+			if (!_tokenService.TryGetUserId(User, out var teacherId))
+			{
+				return Unauthorized("Missing or invalid teacher identity.");
+			}
+
+			try
+			{
+				var created = await _assignedAssignmentService.CreateAssignedAssignmentSetForClassAsync(dto, teacherId);
+				return Ok(created);
+			}
+			catch (InvalidOperationException ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+
 		[Authorize(Roles = "Student")]
 		[HttpGet("student")]
 		public async Task<ActionResult<IEnumerable<AssignedAssignmentSetReadDTO>>> GetStudentAssignedSets()
@@ -78,6 +103,64 @@ namespace LMS_API.Controllers
 
 			var sets = await _assignedAssignmentService.GetAssignedSetsForTeacherAsync(teacherId);
 			return Ok(sets);
+		}
+
+		[Authorize(Roles = "Teacher")]
+		[HttpDelete("sets/{assignedAssignmentSetId:int}")]
+		public async Task<IActionResult> RevokeAssignedSet(int assignedAssignmentSetId)
+		{
+			if (!_tokenService.TryGetUserId(User, out var teacherId))
+			{
+				return Unauthorized("Missing or invalid teacher identity.");
+			}
+
+			var revoked = await _assignedAssignmentService.RevokeAssignedAssignmentSetAsync(assignedAssignmentSetId, teacherId);
+			if (!revoked)
+			{
+				return NotFound("Assigned assignment set was not found.");
+			}
+
+			_logger.LogInformation("Assigned set revoked teacher_id={TeacherId} assigned_set_id={AssignedSetId}", teacherId, assignedAssignmentSetId);
+			return Ok(new { message = "Assigned set revoked." });
+		}
+
+		[Authorize(Roles = "Teacher")]
+		[HttpDelete("students/{studentId:int}/sets")]
+		public async Task<IActionResult> RevokeAllAssignedSetsForStudent(int studentId)
+		{
+			if (!_tokenService.TryGetUserId(User, out var teacherId))
+			{
+				return Unauthorized("Missing or invalid teacher identity.");
+			}
+
+			try
+			{
+				var count = await _assignedAssignmentService.RevokeAllAssignedAssignmentSetsForStudentAsync(studentId, teacherId);
+				return Ok(new { message = "Assigned sets revoked.", revokedCount = count });
+			}
+			catch (InvalidOperationException ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+
+		[Authorize(Roles = "Teacher")]
+		[HttpDelete("assignments/{assignedAssignmentId:int}")]
+		public async Task<IActionResult> DeleteAssignedAssignment(int assignedAssignmentId)
+		{
+			if (!_tokenService.TryGetUserId(User, out var teacherId))
+			{
+				return Unauthorized("Missing or invalid teacher identity.");
+			}
+
+			var deleted = await _assignedAssignmentService.DeleteAssignedAssignmentAsync(assignedAssignmentId, teacherId);
+			if (!deleted)
+			{
+				return NotFound("Assigned assignment was not found.");
+			}
+
+			_logger.LogInformation("Assigned assignment deleted teacher_id={TeacherId} assigned_assignment_id={AssignedAssignmentId}", teacherId, assignedAssignmentId);
+			return Ok(new { message = "Assigned assignment deleted." });
 		}
 
 		[Authorize(Roles = "Student")]
@@ -171,6 +254,38 @@ namespace LMS_API.Controllers
 				if (fileData == null)
 				{
 					return NotFound("Submission file was not found.");
+				}
+
+				return File(fileData.Value.Content, fileData.Value.ContentType, fileData.Value.FileName);
+			}
+			catch (UnauthorizedAccessException)
+			{
+				return Forbid();
+			}
+		}
+
+		[HttpGet("sets/{assignedAssignmentSetId:int}/task-document")]
+		public async Task<IActionResult> GetAssignmentSetTaskDocument(int assignedAssignmentSetId)
+		{
+			if (!_tokenService.TryGetUserId(User, out var userId))
+			{
+				return Unauthorized("Missing or invalid identity.");
+			}
+
+			var isTeacher = User.IsInRole("Teacher");
+			var isStudent = User.IsInRole("Student");
+
+			if (!isTeacher && !isStudent)
+			{
+				return Forbid();
+			}
+
+			try
+			{
+				var fileData = await _assignedAssignmentService.GetAssignmentSetDocumentFileAsync(assignedAssignmentSetId, userId, isTeacher);
+				if (fileData == null)
+				{
+					return NotFound("Task document was not found.");
 				}
 
 				return File(fileData.Value.Content, fileData.Value.ContentType, fileData.Value.FileName);

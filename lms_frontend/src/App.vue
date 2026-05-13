@@ -20,12 +20,10 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%;
-  overflow: hidden;
   background: #0f172a;
 }
 
 #app {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
 }
 </style>

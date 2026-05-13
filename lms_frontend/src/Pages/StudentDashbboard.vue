@@ -26,8 +26,12 @@
         <div v-else class="sets-list">
           <article v-for="set in assignedSets" :key="set.id" class="set-card">
             <div class="set-head">
+				<p v-if="set.assignmentSetName || set.AssignmentSetName"><strong>Opgavesæt:</strong> {{ set.assignmentSetName || set.AssignmentSetName }}</p>
               <p><strong>Tildelt:</strong> {{ formatDate(set.dateOfAssigned || set.DateOfAssigned) }}</p>
               <p><strong>Deadline:</strong> {{ formatDate(set.deadline || set.Deadline) }}</p>
+				<button class="download-btn" @click="downloadTaskset(set.id || set.Id)">
+					Download opgavesæt (DOCX)
+				</button>
             </div>
 
             <ul class="overview-list">
@@ -78,7 +82,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue';
-import { GetStudentAssignedAssignmentSets, UploadAssignedAssignmentResult, getAuthSession } from '../Services/api';
+import { DownloadAssignedAssignmentSetTaskDocument, GetStudentAssignedAssignmentSets, UploadAssignedAssignmentResult, getAuthSession } from '../Services/api';
 
 const errorMessage = ref('');
 const loadingAssigned = ref(false);
@@ -167,6 +171,25 @@ async function submitAssignment(assignedAssignmentId) {
   }
 }
 
+async function downloadTaskset(assignedAssignmentSetId) {
+  if (!assignedAssignmentSetId) return;
+
+  errorMessage.value = '';
+  try {
+    const { blob, fileName } = await DownloadAssignedAssignmentSetTaskDocument(assignedAssignmentSetId);
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    errorMessage.value = error?.message || 'Kunne ikke hente opgavesæt-dokument.';
+  }
+}
+
 onMounted(loadAssignedSets);
 </script>
 
@@ -176,6 +199,20 @@ onMounted(loadAssignedSets);
   background: #f8fafc;
   padding: 2rem;
   overflow-y: auto;
+}
+
+.download-btn {
+  margin-left: auto;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  color: #0f172a;
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.download-btn:hover {
+  background: rgba(15, 23, 42, 0.04);
 }
 
 .dashboard-header {

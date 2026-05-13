@@ -27,6 +27,23 @@ namespace LMS_API.Models
 
 		public Student Student { get; set; }
 
+		public int? AssignmentSetId { get; set; }
+
+		[JsonIgnore]
+		public AssignmentSet? AssignmentSet { get; set; }
+
+		[MaxLength(500)]
+		public string? TaskDocumentPath { get; set; }
+
+		[MaxLength(255)]
+		public string? TaskDocumentFileName { get; set; }
+
+		[MaxLength(255)]
+		public string? TaskDocumentContentType { get; set; }
+
+		public bool IsRevoked { get; set; }
+		public DateTime? RevokedAtUtc { get; set; }
+
 		public List<AssignedAssignment> AssignedAssignments { get; set; } = new();
 	}
 }

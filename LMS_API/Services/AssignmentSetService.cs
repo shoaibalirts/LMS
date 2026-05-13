@@ -50,7 +50,7 @@ namespace LMS_API.Services
                 var sets = await _db.AssignmentSets
                     .Include(x => x.AssignmentAssignmentSets)
                         .ThenInclude(link => link.Assignment)
-                    .Where(x => x.TeacherId == teacherId)
+                    .Where(x => x.TeacherId == teacherId && !x.IsDeleted)
                     .ToListAsync();
 
                 return _mapper.Map<IEnumerable<AssignmentSetReadDTO>>(sets);
@@ -65,11 +65,11 @@ namespace LMS_API.Services
             try
             {
                 var assignmentSet = await _db.AssignmentSets
-                    .FirstOrDefaultAsync(x => x.Id == assignmentSetId && x.TeacherId == teacherId);
+                    .FirstOrDefaultAsync(x => x.Id == assignmentSetId && x.TeacherId == teacherId && !x.IsDeleted);
                 if (assignmentSet == null) return false;
 
                 var assignment = await _db.Assignments
-                    .FirstOrDefaultAsync(x => x.Id == assignmentId && x.TeacherId == teacherId);
+                    .FirstOrDefaultAsync(x => x.Id == assignmentId && x.TeacherId == teacherId && !x.IsDeleted);
                 if (assignment == null) return false;
 
                 var alreadyLinked = await _db.AssignmentAssignmentSets
@@ -89,6 +89,31 @@ namespace LMS_API.Services
             {
                 return false;
             }
+        }
+
+        public async Task<bool> DeleteAssignmentSetAsync(int assignmentSetId, int teacherId)
+        {
+            var assignmentSet = await _db.AssignmentSets
+                .Include(x => x.AssignmentAssignmentSets)
+                .FirstOrDefaultAsync(x => x.Id == assignmentSetId && x.TeacherId == teacherId);
+
+            if (assignmentSet == null) return false;
+
+			if (assignmentSet.IsDeleted)
+			{
+				return true;
+			}
+
+			assignmentSet.IsDeleted = true;
+			assignmentSet.DeletedAtUtc = DateTime.UtcNow;
+			assignmentSet.UpdatedDate = DateTime.Now;
+
+			// Stop future use (e.g., assigning this set), but keep DB row so existing
+			// AssignedAssignmentSets still have a stable reference.
+			_db.AssignmentAssignmentSets.RemoveRange(assignmentSet.AssignmentAssignmentSets);
+
+            await _db.SaveChangesAsync();
+            return true;
         }
     }
 }

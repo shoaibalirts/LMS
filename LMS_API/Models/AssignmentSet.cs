@@ -23,6 +23,9 @@ namespace LMS_API.Models
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
 
+		public bool IsDeleted { get; set; }
+		public DateTime? DeletedAtUtc { get; set; }
+
         // MANY-TO-MANY
         [JsonIgnore]
         public ICollection<AssignmentAssignmentSet> AssignmentAssignmentSets { get; set; } = new List<AssignmentAssignmentSet>();

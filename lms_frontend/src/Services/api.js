@@ -195,6 +195,18 @@ export async function AddAssignmentToAssignmentSet(assignmentSetId, assignmentId
   }, true);
 }
 
+export async function DeleteAssignment(assignmentId) {
+  return await request(`/assignment?id=${encodeURIComponent(String(assignmentId))}`, {
+    method: 'DELETE'
+  }, true);
+}
+
+export async function DeleteAssignmentSet(assignmentSetId) {
+  return await request(`/assignmentset/${encodeURIComponent(String(assignmentSetId))}`, {
+    method: 'DELETE'
+  }, true);
+}
+
 export async function RegisterStudent(firstName, lastName, email, password) {
   return await request('/student', {
     method: 'POST',
@@ -236,6 +248,13 @@ export async function AddStudentsToStudyClass(studyClassId, studentIds) {
 
 export async function CreateAssignedAssignmentSet(data) {
   return await request('/assignedassignment/sets', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }, true);
+}
+
+export async function CreateAssignedAssignmentSetForClass(data) {
+  return await request('/assignedassignment/sets/class', {
     method: 'POST',
     body: JSON.stringify(data)
   }, true);
@@ -323,6 +342,64 @@ export async function DownloadAssignedAssignmentResult(assignedAssignmentId) {
   const fileName = decodeURIComponent(match?.[1] || match?.[2] || `submission-${assignedAssignmentId}.pdf`);
 
   return { blob, fileName };
+}
+
+export async function DownloadAssignedAssignmentSetTaskDocument(assignedAssignmentSetId) {
+  const token = getAccessToken();
+  if (!token) {
+    throw new Error('Missing authentication token. Please log in again.');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/assignedassignment/sets/${assignedAssignmentSetId}/task-document`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (response.status === 401) {
+    clearAuthSession();
+    throw new Error('Unauthorized. Please log in again.');
+  }
+
+  if (!response.ok) {
+    const text = await response.text();
+    const error = new Error(text || `Request failed (${response.status})`);
+    error.status = response.status;
+    throw error;
+  }
+
+  const blob = await response.blob();
+  const contentDisposition = response.headers.get('content-disposition') || '';
+  const match = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i.exec(contentDisposition);
+  const fallback = `taskset-${assignedAssignmentSetId}.docx`;
+  const fileName = decodeURIComponent(match?.[1] || match?.[2] || fallback);
+
+  return { blob, fileName };
+}
+
+export async function RevokeAssignedAssignmentSet(assignedAssignmentSetId) {
+  return await request(`/assignedassignment/sets/${encodeURIComponent(String(assignedAssignmentSetId))}`, {
+    method: 'DELETE'
+  }, true);
+}
+
+export async function GetMyNotifications() {
+  return await request('/notifications', {
+    method: 'GET'
+  }, true);
+}
+
+export async function DeleteAssignedAssignment(assignedAssignmentId) {
+  return await request(`/assignedassignment/assignments/${encodeURIComponent(String(assignedAssignmentId))}`, {
+    method: 'DELETE'
+  }, true);
+}
+
+export async function RevokeAllAssignedAssignmentSetsForStudent(studentId) {
+  return await request(`/assignedassignment/students/${encodeURIComponent(String(studentId))}/sets`, {
+    method: 'DELETE'
+  }, true);
 }
 
 export { getUserIdFromToken };

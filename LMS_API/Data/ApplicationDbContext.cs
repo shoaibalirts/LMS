@@ -11,6 +11,7 @@ namespace LMS_API.Data
         public DbSet<Student> Students { get; set; }
         public DbSet<AssignedAssignmentSet> AssignedAssignmentSets { get; set; }
         public DbSet<AssignedAssignment> AssignedAssignments { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         public DbSet<StudyClass> StudyClasses { get; set; }
         public DbSet<StudentStudyClass> StudentStudyClasses { get; set; }
         public DbSet<AssignmentAssignmentSet> AssignmentAssignmentSets { get; set; }
@@ -85,6 +86,12 @@ namespace LMS_API.Data
                 .HasOne(x => x.Student)
                 .WithMany(s => s.AssignedAssignmentSets)
                 .HasForeignKey(x => x.StudentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<AssignedAssignmentSet>()
+                .HasOne(x => x.AssignmentSet)
+                .WithMany()
+                .HasForeignKey(x => x.AssignmentSetId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<AssignedAssignment>()

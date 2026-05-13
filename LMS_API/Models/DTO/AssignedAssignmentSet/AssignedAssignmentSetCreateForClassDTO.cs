@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LMS_API.Models.DTO.AssignedAssignmentSet
 {
-	public class AssignedAssignmentSetCreateDTO
+	public class AssignedAssignmentSetCreateForClassDTO
 	{
 		[Required]
-		public int StudentId { get; set; }
+		public int StudyClassId { get; set; }
 
 		[Required]
 		public int AssignmentSetId { get; set; }

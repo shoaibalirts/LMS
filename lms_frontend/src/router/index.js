@@ -10,6 +10,7 @@ import FrontPage from '../Pages/FrontPage.vue';
 import TaskCreation from '../Pages/TaskCreation.vue';
 import TasksetCreation from '../Pages/TasksetCreation.vue';
 import AssignedSubmissions from '../Pages/AssignedSubmissions.vue';
+import Notifications from '../Pages/Notifications.vue';
 import { getAuthSession } from '../Services/api';
 import StudentLogin from '../Pages/StudentLogin.vue';
 import StudentDashbboard from '../Pages/StudentDashbboard.vue';
@@ -26,7 +27,8 @@ const routes = [
   { path: '/register-student', name: 'RegisterStudent', component: RegisterStudent, meta: { requiresAuth: true, requiresTeacher: true } },
   { path: '/create-task', name: 'TaskCreation', component: TaskCreation, meta: { requiresAuth: true, requiresTeacher: true } },
   { path: '/create-taskset', name: 'TasksetCreation', component: TasksetCreation, meta: { requiresAuth: true, requiresTeacher: true } },
-  { path: '/assigned-submissions', name: 'AssignedSubmissions', component: AssignedSubmissions, meta: { requiresAuth: true, requiresTeacher: true } }
+  { path: '/assigned-submissions', name: 'AssignedSubmissions', component: AssignedSubmissions, meta: { requiresAuth: true, requiresTeacher: true } },
+  { path: '/notifications', name: 'Notifications', component: Notifications, meta: { requiresAuth: true } }
 ];
 
 const router = createRouter({

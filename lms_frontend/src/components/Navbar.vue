@@ -4,6 +4,9 @@
       <li class="brand">
         <router-link to="/">LMS Portal</router-link>
       </li>
+      <template v-if="loggedIn">
+        <li><router-link to="/notifications">Notifications</router-link></li>
+      </template>
       <template v-if="loggedIn && isTeacher">
         <li><router-link to="/teacher-dashboard">Dashboard</router-link></li>
         <li><router-link to="/create-task">Opret Opgave</router-link></li>

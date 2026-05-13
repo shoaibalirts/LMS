@@ -98,7 +98,15 @@ namespace LMS_API.Controllers
                 return Unauthorized("Missing or invalid teacher identity.");
             }
 
-            var deleted = await _assignmentService.DeleteAssignmentAsync(id, teacherId);
+            bool deleted;
+            try
+            {
+                deleted = await _assignmentService.DeleteAssignmentAsync(id, teacherId);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
 
             if (!deleted)
             {

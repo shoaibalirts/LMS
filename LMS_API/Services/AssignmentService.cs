@@ -51,7 +51,7 @@ namespace LMS_API.Services
             try
             {
                 var assignments = await _db.Assignments
-                    .Where(a => a.TeacherId == teacherId)
+                    .Where(a => a.TeacherId == teacherId && !a.IsDeleted)
                     .ToListAsync();
 
                 return _mapper.Map<IEnumerable<AssignmentReadDTO>>(assignments);
@@ -64,26 +64,33 @@ namespace LMS_API.Services
 
         public async Task<bool> DeleteAssignmentAsync(int id, int teacherId)
         {
-            try
-            {
-                var assignment = await _db.Assignments
-                    .FirstOrDefaultAsync(a => a.Id == id && a.TeacherId == teacherId);
-                if (assignment == null) return false;
+            var assignment = await _db.Assignments
+                .FirstOrDefaultAsync(a => a.Id == id && a.TeacherId == teacherId);
+            if (assignment == null) return false;
 
-                if (assignment.PictureUrl != null)
-                    _fileStorage.Delete(assignment.PictureUrl);
+			if (assignment.IsDeleted)
+			{
+				return true;
+			}
 
-                var links = _db.AssignmentAssignmentSets.Where(x => x.AssignmentId == id);
-                _db.AssignmentAssignmentSets.RemoveRange(links);
+			assignment.IsDeleted = true;
+			assignment.DeletedAtUtc = DateTime.UtcNow;
+			assignment.UpdatedDate = DateTime.Now;
 
-                _db.Assignments.Remove(assignment);
-                await _db.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+			// Prevent future assignment via sets, but keep the Assignment row so existing
+			// assigned submissions/feedback still have a stable reference.
+			var links = _db.AssignmentAssignmentSets.Where(x => x.AssignmentId == id);
+			_db.AssignmentAssignmentSets.RemoveRange(links);
+
+            // Remove from existing assigned sets as requested (so it disappears for students).
+            var assignedToRemove = await _db.AssignedAssignments
+                .Include(x => x.AssignedAssignmentSet)
+                .Where(x => x.AssignmentId == id && x.AssignedAssignmentSet != null && x.AssignedAssignmentSet.TeacherId == teacherId)
+                .ToListAsync();
+            _db.AssignedAssignments.RemoveRange(assignedToRemove);
+
+            await _db.SaveChangesAsync();
+            return true;
         }
     }
 }

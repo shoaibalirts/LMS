@@ -39,6 +39,9 @@ namespace LMS_API.Models
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
 
+		public bool IsDeleted { get; set; }
+		public DateTime? DeletedAtUtc { get; set; }
+
         public int TeacherId { get; set; }
         [JsonIgnore]
         public Teacher? Teacher { get; set; }
