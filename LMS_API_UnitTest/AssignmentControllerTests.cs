@@ -60,7 +60,7 @@ namespace LMS_API_UnitTest
         [Fact]
         public async Task CreateAssignment_NoTeacherIdentity_ReturnsUnauthorized()
         {
-            var dto = new AssignmentCreateDTO { Points = 5, Type = "Quiz", ClassLevel = "A", Subject = "Math" };
+            var dto = new AssignmentCreateDTO { Points = 5, Type = "Delprøve 2", ClassLevel = "A", Subject = "Trigonometri" };
             var teacherId = 0;
             _tokenServiceMock.Setup(s => s.TryGetTeacherId(It.IsAny<ClaimsPrincipal>(), out teacherId)).Returns(false);
 
@@ -141,15 +141,15 @@ namespace LMS_API_UnitTest
             [
                 new List<AssignmentReadDTO>
                 {
-                    new() { Id = 1, Points = 5,  Type = "Quiz",  ClassLevel = "A", Subject = "Math"    },
-                    new() { Id = 2, Points = 10, Type = "Essay", ClassLevel = "B", Subject = "English" },
+                    new() { Id = 1, Points = 5,  Type = "Del prøve 1",  ClassLevel = "A", Subject = "Lineær Algebraa"},
+                    new() { Id = 2, Points = 10, Type = "Del prøve 2", ClassLevel = "B", Subject = "Differentialregning"},
                 }
             ];
             yield return
             [
                 new List<AssignmentReadDTO>
                 {
-                    new() { Id = 3, Points = 0, Type = "Exam", ClassLevel = "C", Subject = "Science" },
+                    new() { Id = 3, Points = 0, Type = "Del prøve 1", ClassLevel = "C", Subject = "Statistik" },
                 }
             ];
         }

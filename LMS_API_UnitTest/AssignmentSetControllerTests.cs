@@ -192,15 +192,15 @@ namespace LMS_API_UnitTest
             [
                 new List<AssignmentSetReadDTO>
                 {
-                    new() { Id = 1, Name = "Math Set"    },
-                    new() { Id = 2, Name = "English Set" },
+                    new() { Id = 1, Name = "Termin prøve 1"},
+                    new() { Id = 2, Name = "Termin prøve 2"},
                 }
             ];
             yield return
             [
                 new List<AssignmentSetReadDTO>
                 {
-                    new() { Id = 3, Name = "Science Set" },
+                    new() { Id = 3, Name = "Termin prøve 3"},
                 }
             ];
         }

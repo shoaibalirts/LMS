@@ -115,7 +115,7 @@ namespace LMS_API_UnitTest
         public IEnumerator<object[]> GetEnumerator()
         {
             yield return [new TeacherLoginDTO { Email = "alice@school.dk",  Password = "pass123"  }];
-            yield return [new TeacherLoginDTO { Email = "bob@school.dk",    Password = "secret99" }];
+            yield return [new TeacherLoginDTO { Email = "alice2@school.dk",    Password = "secret99" }];
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
