@@ -366,3 +366,6 @@ FodyWeavers.xsd
 
 # Runtime-generated uploaded files
 
+bin/
+obj/
+.vs/
