@@ -76,6 +76,15 @@ if (app.Environment.IsDevelopment())
     await DbSeeder.SeedAsync(context);
 }
 
+// Security headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["Cross-Origin-Resource-Policy"] = "same-origin";
+
+    await next();
+});
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -84,13 +93,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowFrontend");
-app.Use(async (context, next) =>
-{
-    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
-    context.Response.Headers["Cross-Origin-Resource-Policy"] = "same-origin";
 
-    await next();
-});
 // Ensure wwwroot exists before serving static files
 var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
 Directory.CreateDirectory(wwwrootPath);
