@@ -90,3 +90,21 @@ jobs:
           format: openapi
           fail_action: false
           allow_issue_writing: false
+
+          # NEW JOB 4: CD Deployment
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    # This prevents deployment if any of the three test jobs fail:
+    needs: [dotnet-test, build-and-test, zap-dast] 
+    # Only deploy on direct merges/pushes to main or master, not on PR test runs:
+    if: github.event_name == 'push' 
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run deployment script
+        run: |
+          echo "Deploying the frontend and backend..."
+          # Add your server deployment or cloud upload commands here
