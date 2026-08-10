@@ -90,7 +90,8 @@ jobs:
           format: openapi
           fail_action: false
           allow_issue_writing: false
-
+      - name: Tear down             # ← clean up AFTER ZAP is done
+        run: docker compose down
           # NEW JOB 4: CD Deployment
   deploy:
     name: Deploy Application
