@@ -1,49 +1,88 @@
 # LMS - Learning Management System
 
-## Quick Start
+## Compose files
 
-Clone the repo and run from the root of the project (where `docker-compose.yml` lives):
+| File | Use it for |
+|---|---|
+| `docker-compose-without-swarm.yml` | **Running locally with Docker.** Builds the API and frontend from source. |
+| `docker-compose.yml` | **Docker Swarm deployments only.** Pulls prebuilt images from Docker Hub and runs multiple replicas. |
+
+> ⚠️ Don't run plain `docker compose up` locally. It uses `docker-compose.yml`, which starts 3 API and 2 frontend replicas that all try to bind the same host ports (8080 / 80). Only one starts and the rest stay stuck in `Created`.
+
+## Quick Start (Docker)
+
+Prerequisite: Docker Desktop running, and ports **80, 1433, 3000, 3100, 8080, 9090, 9100** free (check with `docker ps` and stop anything using them).
+
+Clone the repo and run from the project root:
 
 ```bash
-docker compose up --build
+docker compose -f docker-compose-without-swarm.yml up --build
 ```
 
-First run takes a few minutes to build the images. Subsequent starts are faster:
+The first run takes a few minutes to build the images. The API may restart once or twice while SQL Server initialises (~20s). Later starts are faster:
 
 ```bash
-docker compose up
+docker compose -f docker-compose-without-swarm.yml up
 ```
 
-To stop everything:
+Add `-d` to run in the background. To stop everything:
 
 ```bash
-docker compose down
+docker compose -f docker-compose-without-swarm.yml down
 ```
 
 To stop and wipe all data (database, Grafana dashboards, Prometheus data):
 
 ```bash
-docker compose down -v
+docker compose -f docker-compose-without-swarm.yml down -v
 ```
+
+Once it's up: frontend at http://localhost, API at http://localhost:8080, API docs at http://localhost:8080/scalar.
 
 ---
 
 ## Local Development (without Docker)
 
-**Backend - also starts database:**
-```bash
-cd LMS_API
-dotnet run
-```
-API runs at http://localhost:8080
+Prerequisites: .NET 9 SDK, Node.js 20.19+ or 22.12+, and SQL Server LocalDB (Windows). In Development mode the API connects to `(localdb)\MSSQLLocalDB` and creates and seeds the `LMS` database on first start. If it can't connect, run `sqllocaldb start MSSQLLocalDB`.
 
-**Frontend:**
+**One-time setup:**
 ```bash
 cd lms_frontend
-npm install // if not installed already
+npm install
+```
+
+**Start both** (Windows, from the project root; Ctrl+C stops both):
+```powershell
+.\start.ps1
+```
+
+**Or start them separately:**
+```bash
+# Backend
+cd LMS_API
+dotnet run --launch-profile http
+
+# Frontend (second terminal)
+cd lms_frontend
 npm run dev
 ```
-Frontend runs at http://localhost:5173
+
+- API: http://localhost:8080 (docs at http://localhost:8080/scalar)
+- Frontend: http://localhost:5173
+
+> The frontend calls the API at `http://localhost:8080` (hard-coded in `lms_frontend/src/Services/api.js`), so the API must run on port 8080. Don't run this alongside the Docker setup, because both use port 8080.
+
+---
+
+## Docker Swarm Deployment
+
+`docker-compose.yml` is a Swarm stack file. Push the images first (`shoaibali808/csharp-lms-webapi` and `shoaibali808/vue-lms-frontend`), then on the manager node:
+
+```bash
+docker swarm init            # once, if not already a swarm
+docker stack deploy -c docker-compose.yml lms
+docker stack rm lms          # to remove
+```
 
 ---
 
